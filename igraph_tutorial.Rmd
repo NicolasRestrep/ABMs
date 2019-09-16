@@ -1,0 +1,83 @@
+---
+title: "Networks Tutorial"
+author: "Nicolas Restrepo"
+date: "August 28, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Igraph Tutorial
+
+```{r}
+
+library(tidyverse)
+library(igraph)
+```
+
+
+Let's generate a simple graph 
+
+```{r}
+
+g1 <- graph(edges = c(1,2, 2,3, 3, 1), n = 3, directed = F)
+
+plot(g1)
+```
+
+You can increase the number of nodes but keep the ties you've built 
+
+```{r}
+
+g2 <- graph(edges = c(1,2, 2,3, 3, 1), n = 10, directed = F)
+
+plot(g2)
+```
+
+You can also create graphs with named vertices 
+
+```{r}
+
+g3 <- graph(c("John", "Jim", "Jim", "Jill", "Jill", "John"))
+
+plot(g3)
+```
+
+Create a more elaborate one 
+
+```{r}
+
+g4 <- graph( c("John", "Jim", "Jim", "Jack", "Jim", "Jack", "John", "John"), 
+
+             isolates=c("Jesse", "Janis", "Jennifer", "Justin") ) 
+
+plot(g4)
+```
+
+Explore the network matrix directly 
+
+```{r}
+
+g4[]
+
+V(g4)
+```
+
+Let's try to make a Watts-Strogatz small-world model 
+
+```{r}
+
+sw <- sample_smallworld(dim = 2, size = 10, nei = 1, p = 0.1)
+
+plot(sw, vertex.size = 6, vertex.label = NA, layout = layout_in_circle)
+```
+
+Can I get the attributes? 
+
+```{r}
+ 
+matrix <- as.matrix(sw[])
+```
+
