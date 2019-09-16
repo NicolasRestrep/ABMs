@@ -1,0 +1,188 @@
+---
+title: "Transmission of Useless Culture"
+author: "Nicolas Restrepo"
+date: "September 14, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+
+library(tidyverse)
+library(igraph)
+```
+
+## First attempt
+
+Here, I will give a first go to the agent-based model I want to run 
+
+## Set-up 
+
+### Environment 
+
+Let's think about the setup. The first thing that I need to figure out is the environment. It is going to be a small world network which is easily generated with igraph. Let's begin with 30 nodes.
+
+```{r}
+
+# Create small world network 
+
+sw_network <- sample_smallworld(dim = 1, size = 30, nei = 2, p = 0.1, 10, loops = F)
+
+# Visualize it 
+
+plot(sw_network, vertex.size = 6, vertex.label = NA, layout = layout_in_circle)
+
+```
+
+Now that we have the igraph object I can extract the matrix of nodes
+
+```{r}
+
+# Extract network matrix 
+
+net_matrix <- as.matrix(sw_network[])
+
+```
+
+### Agents 
+
+Let's say that we will keep track of each agent using a dataframe. Each agent will have different columns for each pereference as well as for their overall conviction score.  
+
+```{r}
+
+# Create empty dataframe for the weights of preferences
+
+data <- tibble(agent = 1:30, 
+               h1 = 1, 
+               h2 = 1, 
+               h3 = 1, 
+               h4 = 1)
+
+```
+
+I think this will do for now. 
+
+Now let me think about how actual updating might seem like. Let's go step by step. The first step would be to decide how the distributions of each preference get established. 
+
+```{r}
+values <- tibble(w4 = rnorm(1, 1, n = 100), 
+                 w2 = rnorm(0.5, 1, n = 100), 
+                 w3 = rnorm(0.75, 1, n = 100), 
+                 w1 = rnorm(0.25, 1, n = 100)) %>% 
+  gather()
+
+values %>% 
+  ggplot(aes(x = value, color = key)) + 
+  geom_density(aes(fill = key ), alpha = 0.3)
+
+```
+
+Alright let's try with these distributions to begin with. 
+
+
+### Procedure 
+
+I need to begin thinking about the process itself. The first step here is to think about which representation is each agent going to play at the beginning of each turn. Let me conceive of it as a series of little procedures and then I can turn it into a more reproducible function. 
+
+```{r}
+
+
+go <- function(x) {
+
+# Draw from each distribution according to the weight of each actor 
+
+w1 <- rnorm(0.25, 1, n = data$h1[x])
+
+w2 <- rnorm(0.5, 1, n = data$h2[x])
+
+w3 <- rnorm(0.75, 1, n = data$h3[x])
+
+w4 <- rnorm(1, 1, n = data$h4[x])
+
+# Concatenate all values into a dataframe
+
+draws <- data.frame(w1, w2, w3, w4) %>% gather()
+
+# Which distribution produced the draw closest to zero 
+
+lowest <- draws %>% 
+  mutate(value = abs(value)) %>% 
+  filter(value == min(value))
+
+played <- lowest$key
+
+ 
+}
+
+# Create vector of heuristics played on first round 
+
+disp <-  map_chr(c(1:30), go)
+```
+
+Now I should try to find out my agents neighbor
+
+```{r}
+
+for (i in 1:30) {
+  
+# Find the neighbors of my agent
+
+neighbors <- which(net_matrix[i,] != 0)
+
+# Dispositions that should be updated
+
+to_update <- disp[neighbors]
+
+w_w1 <- sum(str_detect("w1", to_update))
+
+w_w2 <- sum(str_detect("w2", to_update))
+
+w_w3 <- sum(str_detect("w3", to_update))
+
+w_w4 <- sum(str_detect("w4", to_update))
+
+# Update the weights on the original dataframe 
+
+data$h1[i] <- data$h1[i] + w_w1
+data$h2[i] <- data$h2[i] + w_w2
+data$h3[i] <- data$h3[i] + w_w3 
+data$h4[i] <- data$h4[i] + w_w4
+
+}  
+  
+
+```
+
+
+Alright this is a great place. 
+
+
+### Visualizing convictions 
+
+```{r}
+
+# Create column for the current conviction of each agent or whether they are undecided 
+
+d_graph <- data %>% 
+  mutate(conviction = case_when(h1 > h2 & h1 > h3 & h1 > h4 ~ "h1", 
+                                h2 > h1 & h2 > h3 & h2 > h4 ~ "h2", 
+                                h3 > h1 & h3 > h2 & h3 > h4 ~ "h3", 
+                                h4 > h1 & h4 > h2 & h4 > h3 ~ "h4", 
+                                h1 == h2 | h1 == h3 | h1 == h4 | h2 == h3 | h2 == 4 | h3 == h4 ~ "undecided"))
+
+
+# Add convictions to the network 
+
+V(sw_network)$conviction <- d_graph$conviction
+
+
+plot(sw_network, vertex.color = V(sw_network)$color, col="#777777", vertex.label=V(sw_network)$conviction)
+```
+
+Awesome! You have a plot where certain heuristics are flowing. 
+
+
