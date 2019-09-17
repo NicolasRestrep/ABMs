@@ -69,10 +69,11 @@ I think this will do for now.
 Now let me think about how actual updating might seem like. Let's go step by step. The first step would be to decide how the distributions of each preference get established. 
 
 ```{r}
-values <- tibble(w4 = rnorm(1, 1, n = 100), 
-                 w2 = rnorm(0.5, 1, n = 100), 
-                 w3 = rnorm(0.75, 1, n = 100), 
-                 w1 = rnorm(0.25, 1, n = 100)) %>% 
+values <- tibble(rw = rnorm(0, 1, n = 1000),
+                 w4 = rnorm(1, 1, n = 1000), 
+                 w2 = rnorm(1.25, 1, n = 1000), 
+                 w3 = rnorm(1.5, 1, n = 1000), 
+                 w1 = rnorm(1.75, 1, n = 1000)) %>% 
   gather()
 
 values %>% 
@@ -202,27 +203,23 @@ Here, I am going to start making the first loop
 
 ```{r}
 
-after_each_round <- matrix(0, 30, 250)
+after_each_round <- matrix(0, 30, 5)
 
-for (k in 1:250) {
+for (k in 1:5) {
   
-  w1 <- 0
-  w2 <- 0
-  w3 <- 0
-  w4 <- 0
   disp <- matrix(0, 30)
   
   for (i in 1:30) {
     
     # Draw from each distribution according to the weight of each actor 
     
-    w1 <- rnorm(0.25, 1, n = data$h1[i])
+    w1 <- rnorm(-4, 1, n = data$h1[i])
     
-    w2 <- rnorm(0.5, 1, n = data$h2[i])
+    w2 <- rnorm(4, 5, n = data$h2[i])
     
-    w3 <- rnorm(0.75, 1, n = data$h3[i])
+    w3 <- rnorm(-3, 5, n = data$h3[i])
     
-    w4 <- rnorm(1, 1, n = data$h4[i])
+    w4 <- rnorm(3, 1, n = data$h4[i])
     
   
     # Concatenate all values into a list
@@ -284,7 +281,7 @@ for (k in 1:250) {
   
   after_each_round[, k] <- d_graph$conviction
   
-  if (k %% 50) { 
+  if (k %% 1) { 
     
     V(sw_network)$conviction <- d_graph$conviction
     
