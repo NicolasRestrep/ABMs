@@ -1,0 +1,50 @@
+---
+title: "Third Class"
+author: "Nicolas Restrepo"
+date: "September 17, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Discussion 
+
+- NDTV --> this could be useful 
+
+- Having some idea (some grounding) in the real data 
+
+- Data you will never get or you want to do something illegal 
+
+- How small changes make a big difference - structural cohesion & diffusion 
+
+- This is something you *absolutely* need to take into account 
+
+- Imagine a space of distributions ---> this would be awesome 
+
+- This is absolutely incredible 
+
+- Let's imagine this wide-range of worlds 
+
+- Be cognizant of the units you are picking 
+
+- Think about the effects of simultaneity 
+
+- Fixing bugs should come after you've got things running 
+
+- Get the damn thing to work 
+
+- Important to find out how long iterations take to run 
+
+## Workshop 
+
+- Consistency of actors or status maximizers 
+
+- Morris and Hancock ---> this is what you need to do 
+
+- Does your network change? This is a key question 
+
+- Try to write your ABM as a regression equation 
+
+- Kathleen Carly 
