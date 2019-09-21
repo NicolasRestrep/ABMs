@@ -1,13 +1,10 @@
 
-after_each_round <- matrix(0, 30, 100)
+after_each_round <- matrix(0, 30, 1000)
 
+report_data <- list()
 
-for (k in 1:100) {
+for (k in 1:1000) {
   
-  w1 <- 0
-  w2 <- 0
-  w3 <- 0
-  w4 <- 0
   disp <- matrix(0, 30)
   
   for (i in 1:30) {
@@ -77,12 +74,14 @@ for (k in 1:100) {
                                   h2 > h1 & h2 > h3 & h2 > h4 ~ "h2", 
                                   h3 > h1 & h3 > h2 & h3 > h4 ~ "h3", 
                                   h4 > h1 & h4 > h2 & h4 > h3 ~ "h4", 
-                                  h1 == h2 | h1 == h3 | h1 == h4 | h2 == h3 | h2 == 4 | h3 == h4 ~ "undecided"))
+                                  h1 == h2 | h1 == h3 | h1 == h4 | h2 == h3 | h2 == h4 | h3 == h4 ~ "undecided"))
   
   
   after_each_round[, k] <- d_graph$conviction
   
-  if (k %% 25) { 
+  report_data[[k]] <- d_graph
+  
+  if (k %% 100) { 
     
     V(sw_network)$conviction <- d_graph$conviction
     
@@ -98,6 +97,10 @@ for (k in 1:100) {
     
     
     plot(sw_network, vertex.color = V(sw_network)$color, col="#777777", vertex.label=V(sw_network)$conviction)
-    }
+  }
+  
+  print(as.character(k))
+  
+  
 }
 
