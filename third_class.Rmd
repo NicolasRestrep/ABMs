@@ -48,3 +48,7 @@ knitr::opts_chunk$set(echo = TRUE)
 - Try to write your ABM as a regression equation 
 
 - Kathleen Carly 
+
+- Almost all of our models have more parameters than the ones we have chosen 
+
+- Store as much as possible at the beggining 
